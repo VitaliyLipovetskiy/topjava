@@ -3,6 +3,8 @@ package ru.javawebinar.topjava.web;
 import org.slf4j.Logger;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.MealTo;
+import ru.javawebinar.topjava.repository.MealDao;
+import ru.javawebinar.topjava.repository.MealsRepository;
 import ru.javawebinar.topjava.util.MealsUtil;
 
 import javax.servlet.ServletException;
@@ -25,29 +27,30 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class MealServlet extends HttpServlet {
     private static final Logger log = getLogger(MealServlet.class);
 
+    private final MealsRepository repository;
+
     public static final int caloriesPerDay = 2000;
-    private static List<Meal> meals;
 
     public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+    public MealServlet() {
+        this.repository = new MealDao();
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html;charset=utf-8");
         if (request.getParameterMap().get("action") != null) {
             String parameterAction = request.getParameter("action");
-            Meal meal = null;
-            String parameterId = request.getParameter("id");
-            if (parameterId != null) {
-                meal = meals.stream()
-                        .filter(m -> m.getId().equals(Integer.parseInt(parameterId)))
-                        .findFirst().get();
+            if (parameterAction.equals("add")) {
+                log.debug("redirect to meals add");
+                request.getRequestDispatcher("/meal.jsp").forward(request, response);
+                return;
             }
+            Integer id = Integer.parseInt(request.getParameter("id"));
+            Meal meal = repository.getMealById(id);
+
             switch (parameterAction) {
-                case "add":
-                    log.debug("redirect to meals add");
-//                    request.setAttribute("meal", meal);
-                    request.getRequestDispatcher("/meal.jsp").forward(request, response);
-                    return;
                 case "edit":
                     log.debug("redirect to meals edit");
                     request.setAttribute("meal", meal);
@@ -55,42 +58,39 @@ public class MealServlet extends HttpServlet {
                     return;
                 case "delete":
                     log.debug("redirect to meals delete " + meal.getId());
-                    meals.remove(meal);
+                    repository.remove(meal);
+                    List<MealTo> mealsTo = MealsUtil.filteredByStreams(repository.getAllMeals(), LocalTime.of(0, 0), LocalTime.of(23, 59, 59), caloriesPerDay);
+                    request.setAttribute("meals", mealsTo);
+                    response.sendRedirect("meals");
+                    return;
             }
         }
         log.debug("redirect to meals");
 
-        recalculationAndForward(request, response);
+        List<MealTo> mealsTo = MealsUtil.filteredByStreams(repository.getAllMeals(), LocalTime.of(0, 0), LocalTime.of(23, 59, 59), caloriesPerDay);
+        request.setAttribute("meals", mealsTo);
         request.getRequestDispatcher("/meals.jsp").forward(request, response);
+
 //        response.sendRedirect("meals.jsp");
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
-        //        super.doPost(req, resp);
         log.debug("redirect to Post");
 
-//        req.getParameterMap().keySet().forEach(System.out::println);
-//        System.out.println(req.getParameter("id"));
         String parameterId = req.getParameter("id");
-//        System.out.println(id);
-        if (parameterId.isEmpty()) {
-            System.out.println("add");
-            meals.add(new Meal(40, LocalDateTime.parse(req.getParameter("dateTime")),
+        if (parameterId == null || parameterId.isEmpty()) {
+            repository.add(new Meal(LocalDateTime.parse(req.getParameter("dateTime")),
                     req.getParameter("description"),
-                    Integer.parseInt(req.getParameter("calories"))));
+                    Integer.parseInt(req.getParameter("calories").isEmpty() ? "0" : req.getParameter("calories"))));
         } else {
-            Meal meal = meals.stream()
-                    .filter(m -> m.getId().equals(Integer.parseInt(parameterId)))
-                    .findFirst().orElseGet(null);
-            System.out.println("update");
+            Meal meal = repository.getMealById(Integer.parseInt(parameterId));
             LocalDateTime dateTime = LocalDateTime.parse(req.getParameter("dateTime"));
             if (!meal.getDateTime().equals(dateTime)) {
                 meal.setDateTime(dateTime);
             }
             String description = req.getParameter("description");
-            System.out.println(description);
             if (!meal.getDescription().equals(description)) {
                 meal.setDescription(description);
             }
@@ -98,31 +98,13 @@ public class MealServlet extends HttpServlet {
             if (meal.getCalories() != calories) {
                 meal.setCalories(calories);
             }
-            meals.set(meals.indexOf(meal), meal);
+            repository.update(meal);
         }
 
-        recalculationAndForward(req, resp);
+        List<MealTo> mealsTo = MealsUtil.filteredByStreams(repository.getAllMeals(), LocalTime.of(0, 0), LocalTime.of(23, 59, 59), caloriesPerDay);
+        req.setAttribute("meals", mealsTo);
         resp.sendRedirect("meals");
-        ;
 
     }
 
-    private void recalculationAndForward(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        List<MealTo> mealsTo = MealsUtil.filteredByStreams(meals, LocalTime.of(0, 0), LocalTime.of(23, 59, 59), caloriesPerDay);
-        request.setAttribute("meals", mealsTo);
-    }
-
-    @Override
-    public void init() throws ServletException {
-        super.init();
-        meals = new CopyOnWriteArrayList(Arrays.asList(
-                new Meal(1, LocalDateTime.of(2020, Month.JANUARY, 30, 10, 0), "Завтрак", 500),
-                new Meal(2, LocalDateTime.of(2020, Month.JANUARY, 30, 13, 0), "Обед", 1000),
-                new Meal(3, LocalDateTime.of(2020, Month.JANUARY, 30, 20, 0), "Ужин", 500),
-                new Meal(4, LocalDateTime.of(2020, Month.JANUARY, 31, 0, 0), "Еда на граничное значение", 100),
-                new Meal(5, LocalDateTime.of(2020, Month.JANUARY, 31, 10, 0), "Завтрак", 1000),
-                new Meal(6, LocalDateTime.of(2020, Month.JANUARY, 31, 13, 0), "Обед", 500),
-                new Meal(7, LocalDateTime.of(2020, Month.JANUARY, 31, 20, 0), "Ужин", 410)
-        ));
-    }
 }

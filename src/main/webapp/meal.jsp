@@ -10,7 +10,7 @@
 <h2>Edit meal</h2>
 
 <form action="meals" method="post">
-    <input name="id" value="${meal.id}"/>
+    <input type="hidden" name="id" value="${meal.id}"/>
     <table>
         <tr>
             <td>DateTime:</td>
