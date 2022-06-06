@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%--<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>--%>
 <%--<%--%>
 <%--    Object mealTo = request.getAttribute("mealTo");--%>
 <%--%>--%>
@@ -11,9 +12,7 @@
 <h3><a href="index.html">Home</a></h3>
 <hr>
 <h2>Meals</h2>
-<h4><a href="add_meal.html">Add Meal</a></h4>
-<%--<c:out value="${12+56*2}" />--%>
-<%--<c:set var="mealsTo" value='${requestScope["mealsTo"]}'/>--%>
+<h4><a href="meals?action=add">Add Meal</a></h4>
 <table border cellpadding="8">
     <tr>
         <th>Date</th>
@@ -22,18 +21,21 @@
         <th></th>
         <th></th>
     </tr>
-    <c:forEach var="mealTo" items="${mealsTo}">
-        <c:if test="${mealTo.excess}">
-            <tr style="color: red">
-        </c:if>
-        <c:if test="${!mealTo.excess}">
-            <tr style="color: forestgreen">
-        </c:if>
-        <td>${mealTo.dateTime}</td>
-        <td>${mealTo.description}</td>
-        <td>${mealTo.calories}</td>
-        <td><a href="update.html">Update</a></td>
-        <td><a href="update.html">Delete</a></td>
+    <c:forEach var="meal" items="${meals}">
+        <c:choose>
+            <c:when test="${meal.excess}">
+                <tr style="color: red">
+            </c:when>
+            <c:otherwise>
+                <tr style="color: forestgreen">
+            </c:otherwise>
+        </c:choose>
+        <td>${meal.dateTime}</td>
+        <%--        <td><fmt:formatDate pattern="yyyy-MM-dd HH:mm" value="${mealTo.dateTime}" /></td>--%>
+        <td>${meal.description}</td>
+        <td>${meal.calories}</td>
+        <td><a href="meals?action=edit&id=${meal.id}">Update</a></td>
+        <td><a href="meals?action=delete&id=${meal.id}">Delete</a></td>
         </tr>
     </c:forEach>
 </table>
