@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Month;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -25,15 +26,15 @@ public class MealServlet extends HttpServlet {
     public static final int caloriesPerDay = 2000;
     private static List<Meal> meals;
 
+    public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        log.debug("redirect to meals");
         response.setContentType("text/html;charset=utf-8");
+        log.debug("redirect to meals");
         List<MealTo> mealsTo = MealsUtil.filteredByStreams(meals, LocalTime.of(0, 0), LocalTime.of(23, 59, 59), caloriesPerDay);
-        request.setAttribute("mealsTo", mealsTo);
-
+        request.setAttribute("meals", mealsTo);
         request.getRequestDispatcher("/meals.jsp").forward(request, response);
-//        response.sendRedirect("meals.jsp");
     }
 
     @Override
