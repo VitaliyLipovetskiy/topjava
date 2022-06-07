@@ -18,11 +18,11 @@
         </tr>
         <tr>
             <td>Description:</td>
-            <td><input formenctype="text/plain" type="text" name="description" value="${meal.description}"/></td>
+            <td><input type="text" name="description" value="${meal.description}"/></td>
         </tr>
         <tr>
             <td>Calories:</td>
-            <td><input name="calories" value="${meal.calories}"/></td>
+            <td><input type="number" name="calories" value="${meal.calories}"/></td>
         </tr>
         <tr>
             <td>
