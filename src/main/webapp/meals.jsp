@@ -13,7 +13,7 @@
 <hr>
 <h2>Meals</h2>
 <h4><a href="meals?action=add">Add Meal</a></h4>
-<table border cellpadding="8">
+<table border="1" cellpadding="8" cellspacing="0">
     <tr>
         <th>Date</th>
         <th>Description</th>
@@ -21,13 +21,14 @@
         <th></th>
         <th></th>
     </tr>
-    <c:forEach var="meal" items="${meals}">
+    <c:forEach var="meal" items="${requestScope.meals}">
+        <jsp:useBean id="meal" type="ru.javawebinar.topjava.model.MealTo"/>
         <c:choose>
             <c:when test="${meal.excess}">
                 <tr style="color: red">
             </c:when>
             <c:otherwise>
-                <tr style="color: forestgreen">
+                <tr style="color: green">
             </c:otherwise>
         </c:choose>
         <td>${meal.dateTime}</td>

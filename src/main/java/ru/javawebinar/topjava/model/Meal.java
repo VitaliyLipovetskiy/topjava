@@ -6,11 +6,16 @@ import java.time.LocalTime;
 
 public class Meal {
     private Integer id;
-    private LocalDateTime dateTime;
-    private String description;
-    private int calories;
+    private final LocalDateTime dateTime;
+    private final String description;
+    private final int calories;
 
     public Meal(LocalDateTime dateTime, String description, int calories) {
+        this(null, dateTime, description, calories);
+    }
+
+    public Meal(Integer id, LocalDateTime dateTime, String description, int calories) {
+        this.id = id;
         this.dateTime = dateTime;
         this.description = description;
         this.calories = calories;
@@ -44,16 +49,17 @@ public class Meal {
         return dateTime.toLocalTime();
     }
 
-    public void setDateTime(LocalDateTime dateTime) {
-        this.dateTime = dateTime;
+    public boolean isNew() {
+        return id == null;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    @Override
+    public String toString() {
+        return "Meal{" +
+                "id=" + id +
+                ", dateTime=" + dateTime +
+                ", description='" + description + '\'' +
+                ", calories=" + calories +
+                '}';
     }
-
-    public void setCalories(int calories) {
-        this.calories = calories;
-    }
-
 }
