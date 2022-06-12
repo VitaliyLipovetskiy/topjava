@@ -18,7 +18,7 @@ public abstract class AbstractUserController {
     private UserService service;
 
     public List<User> getAll() {
-        log.info("getAll");
+        log.info("getAll users count={}", service.getAll().size());
         return service.getAll();
     }
 

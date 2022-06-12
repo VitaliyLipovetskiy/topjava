@@ -7,13 +7,16 @@ import java.util.Collection;
 // TODO add userId
 public interface MealRepository {
     // null if updated meal does not belong to userId
-    Meal save(Meal meal);
+    // null, если обновленная еда не принадлежит userId
+    Meal save(Meal meal, int userId);
 
     // false if meal does not belong to userId
-    boolean delete(int id);
+    // false, если еда не принадлежит userId
+    boolean delete(int id, int userId);
 
     // null if meal does not belong to userId
-    Meal get(int id);
+    // null, если еда не принадлежит userId
+    Meal get(int id, int userId);
 
     // ORDERED dateTime desc
     Collection<Meal> getAll();
