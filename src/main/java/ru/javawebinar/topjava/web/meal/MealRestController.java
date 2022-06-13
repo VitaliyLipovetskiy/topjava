@@ -11,6 +11,7 @@ import ru.javawebinar.topjava.util.MealsUtil;
 import ru.javawebinar.topjava.web.SecurityUtil;
 
 import java.util.List;
+import java.util.Map;
 
 import static ru.javawebinar.topjava.util.ValidationUtil.assureIdConsistent;
 import static ru.javawebinar.topjava.util.ValidationUtil.checkNew;
@@ -23,6 +24,14 @@ public class MealRestController {
     private MealService service;
 
     public List<MealTo> getAll() {
+        log.info("begin");
+        List<MealTo> mealTos = MealsUtil.getTos(service.getAll(), SecurityUtil.authUserCaloriesPerDay());
+        log.info("getAll count={}", mealTos.size());
+        mealTos.forEach(System.out::println);
+        return mealTos;
+    }
+
+    public List<MealTo> getAll(Map<String, String> filters) {
         log.info("begin");
         List<MealTo> mealTos = MealsUtil.getTos(service.getAll(), SecurityUtil.authUserCaloriesPerDay());
         log.info("getAll count={}", mealTos.size());
