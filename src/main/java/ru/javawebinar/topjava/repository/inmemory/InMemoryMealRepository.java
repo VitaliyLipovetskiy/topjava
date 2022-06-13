@@ -28,19 +28,19 @@ public class InMemoryMealRepository implements MealRepository {
     public final static int ADMIN_ID = 3;
 
     {
-        save(new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 10, 0),
+        save(new Meal(LocalDateTime.of(2020, Month.JANUARY, 29, 10, 0),
                 "Завтрак", 500), USER_ID_ONE);
         save(new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 13, 0),
                 "Обед", 1000), USER_ID_ONE);
-        save(new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 20, 0),
+        save(new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 20, 0),
                 "Ужин", 500), USER_ID_ONE);
         save(new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 0, 0),
-                "Еда на граничное значение", 100), USER_ID_TWO);
-        save(new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 10, 0),
+                "Еда на граничное значение", 100), USER_ID_ONE);
+        save(new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 10, 0),
                 "Завтрак", 1000), USER_ID_TWO);
-        save(new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 13, 0),
+        save(new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 13, 0),
                 "Обед", 500), ADMIN_ID);
-        save(new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 20, 0),
+        save(new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 20, 0),
                 "Ужин", 410), ADMIN_ID);
 //        MealsUtil.meals.forEach(meal -> save(meal, 1));
     }

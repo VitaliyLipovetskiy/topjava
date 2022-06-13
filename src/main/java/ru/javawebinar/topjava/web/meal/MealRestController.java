@@ -23,6 +23,7 @@ public class MealRestController {
     private MealService service;
 
     public List<MealTo> getAll() {
+        log.info("begin");
         List<MealTo> mealTos = MealsUtil.getTos(service.getAll(), SecurityUtil.authUserCaloriesPerDay());
         log.info("getAll count={}", mealTos.size());
         mealTos.forEach(System.out::println);
