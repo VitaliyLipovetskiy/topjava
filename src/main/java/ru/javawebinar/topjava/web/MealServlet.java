@@ -2,17 +2,10 @@ package ru.javawebinar.topjava.web;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.stereotype.Controller;
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.repository.MealRepository;
-import ru.javawebinar.topjava.repository.inmemory.InMemoryMealRepository;
-import ru.javawebinar.topjava.util.MealsUtil;
 import ru.javawebinar.topjava.web.meal.MealRestController;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -20,6 +13,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class MealServlet extends HttpServlet {
@@ -29,11 +24,21 @@ public class MealServlet extends HttpServlet {
 
     private MealRestController controller;
 
+    private ClassPathXmlApplicationContext ctx;
+
+    private Map<String, String> filter = new HashMap<>();
+
     @Override
     public void init() {
-        ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("./spring/spring-app.xml");
+        ctx = new ClassPathXmlApplicationContext("./spring/spring-app.xml");
         controller = ctx.getBean(MealRestController.class);
 //        repository = new InMemoryMealRepository();
+    }
+
+    @Override
+    public void destroy() {
+        ctx.close();
+        super.destroy();
     }
 
     @Override
@@ -59,6 +64,27 @@ public class MealServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
 
+        System.out.println("cansel " + request.getParameter("cansel"));
+        if (Objects.equals(request.getParameter("cansel"), "true")) {
+            filter.clear();
+            request.setAttribute("startDate", null);
+            request.setAttribute("endDate", null);
+            request.setAttribute("startTime", null);
+            request.setAttribute("endTime", null);
+        } else {
+            if (request.getParameter("startDate") != null && !request.getParameter("startDate").isEmpty()) {
+                filter.put("startDate", request.getParameter("startDate"));
+            }
+            if (request.getParameter("endDate") != null && !request.getParameter("endDate").isEmpty()) {
+                filter.put("endDate", request.getParameter("endDate"));
+            }
+            if (request.getParameter("startTime") != null && !request.getParameter("startTime").isEmpty()) {
+                filter.put("startTime", request.getParameter("startTime"));
+            }
+            if (request.getParameter("endTime") != null && !request.getParameter("endTime").isEmpty()) {
+                filter.put("endTime", request.getParameter("endTime"));
+            }
+        }
         switch (action == null ? "all" : action) {
             case "delete":
                 int id = getId(request);
@@ -77,9 +103,12 @@ public class MealServlet extends HttpServlet {
             case "all":
             default:
                 log.info("getAll");
-                controller.getAll();
-                request.setAttribute("meals",
-                        controller.getAll());
+                if (filter.isEmpty()) {
+                    request.setAttribute("meals", controller.getAll());
+                } else {
+                    request.setAttribute("meals", controller.getAll(filter));
+                }
+                request.setAttribute("filter", filter);
                 request.getRequestDispatcher("/meals.jsp").forward(request, response);
                 break;
         }
