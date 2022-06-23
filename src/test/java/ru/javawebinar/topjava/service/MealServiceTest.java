@@ -36,7 +36,7 @@ public class MealServiceTest {
 
     @Test
     public void get() {
-        Meal meal = service.get(100003, USER_ID);
+        Meal meal = service.get(100004, USER_ID);
         assertThat(meal).as("check %s", meal.getDescription()).isEqualTo(meal_100004);
     }
 
