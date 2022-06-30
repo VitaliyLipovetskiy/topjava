@@ -23,6 +23,8 @@ public class MealService {
     }
 
     public Meal get(int id, int userId) {
+//        Meal meal = repository.get(id, userId);
+//        System.out.println("user1 " + meal.getUser());
         return checkNotFoundWithId(repository.get(id, userId), id);
     }
 

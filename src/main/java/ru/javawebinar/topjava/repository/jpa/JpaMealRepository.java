@@ -1,9 +1,11 @@
 package ru.javawebinar.topjava.repository.jpa;
 
+import org.springframework.dao.RecoverableDataAccessException;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.Meal;
+import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.MealRepository;
 
 import javax.persistence.EntityManager;
@@ -22,14 +24,33 @@ public class JpaMealRepository implements MealRepository {
     @Transactional
     public Meal save(Meal meal, int userId) {
         if (meal.isNew()) {
+            if (((Number) em.createNamedQuery(Meal.GET_DUPLICATE)
+                    .setParameter("user_id", userId)
+                    .setParameter("date_time", meal.getDateTime())
+                    .getSingleResult()).intValue() > 0) {
+                throw new RecoverableDataAccessException("");
+            }
+            User ref = em.getReference(User.class, userId);
+            meal.setUser(ref);
             em.persist(meal);
             return meal;
         } else {
-            return em.merge(meal);
+            if (em.createNamedQuery(Meal.UPDATE)
+                    .setParameter("description", meal.getDescription())
+                    .setParameter("calories", meal.getCalories())
+                    .setParameter("date_time", meal.getDateTime())
+                    .setParameter("id", meal.id())
+                    .setParameter("user_id", userId)
+                    .executeUpdate() != 0) {
+                return em.getReference(Meal.class, meal.id());
+            } else {
+                return null;
+            }
         }
     }
 
     @Override
+    @Transactional
     public boolean delete(int id, int userId) {
         return em.createNamedQuery(Meal.DELETE)
                 .setParameter("id", id)
@@ -55,7 +76,7 @@ public class JpaMealRepository implements MealRepository {
 
     @Override
     public List<Meal> getBetweenHalfOpen(LocalDateTime startDateTime, LocalDateTime endDateTime, int userId) {
-        return em.createNamedQuery(Meal.ALL_SORTED, Meal.class)
+        return em.createNamedQuery(Meal.BETWEEN_HALF_OPEN, Meal.class)
                 .setParameter("user_id", userId)
                 .setParameter("startDateTime", startDateTime)
                 .setParameter("endDateTime", endDateTime)

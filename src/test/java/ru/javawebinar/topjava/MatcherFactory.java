@@ -22,6 +22,7 @@ public class MatcherFactory {
         }
 
         public void assertMatch(T actual, T expected) {
+            System.out.println(Arrays.toString(fieldsToIgnore));
             assertThat(actual).usingRecursiveComparison().ignoringFields(fieldsToIgnore).isEqualTo(expected);
         }
 

@@ -134,4 +134,26 @@ public class User extends AbstractNamedEntity {
                 ", caloriesPerDay=" + caloriesPerDay +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof User)) {
+            System.out.println(3333);
+            return false;
+        }
+        User user = (User) o;
+        if ((this.getId() == null && user.getId() != null) ||
+                (this.getId() != null &&
+                        !this.getId().equals(user.getId()))) {
+            System.out.println(4444);
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        System.out.println("user id=" + id + " " + Objects.hash(super.hashCode(), email, password, enabled, caloriesPerDay));
+        return Objects.hash(super.hashCode(), email, password, enabled, caloriesPerDay);
+    }
 }

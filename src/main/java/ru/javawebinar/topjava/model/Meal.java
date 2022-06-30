@@ -7,10 +7,15 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Objects;
 
 @NamedQueries({
         @NamedQuery(name = Meal.DELETE, query = "DELETE FROM Meal m WHERE m.id=:id AND m.user.id=:user_id"),
+        @NamedQuery(name = Meal.UPDATE, query = "UPDATE Meal m" +
+                " SET m.description=:description, m.calories=:calories, m.dateTime=:date_time" +
+                " WHERE m.id=:id AND m.user.id=:user_id"),
         @NamedQuery(name = Meal.GET, query = "SELECT m FROM Meal m WHERE m.id=:id AND m.user.id=:user_id"),
+        @NamedQuery(name = Meal.GET_DUPLICATE, query = "SELECT COUNT(m) FROM Meal m WHERE m.dateTime=:date_time AND m.user.id=:user_id"),
         @NamedQuery(name = Meal.ALL_SORTED, query = "SELECT m FROM Meal m WHERE m.user.id=:user_id ORDER BY m.dateTime DESC"),
         @NamedQuery(name = Meal.BETWEEN_HALF_OPEN, query = "SELECT m FROM Meal m WHERE m.user.id=:user_id AND " +
                 "m.dateTime >= :startDateTime AND m.dateTime < :endDateTime ORDER BY m.dateTime DESC"),
@@ -20,7 +25,9 @@ import java.time.LocalTime;
 public class Meal extends AbstractBaseEntity {
 
     public static final String DELETE = "Meal.delete";
+    public static final String UPDATE = "Meal.update";
     public static final String GET = "Meal.get";
+    public static final String GET_DUPLICATE = "Meal.getDuplicate";
     public static final String ALL_SORTED = "Meal.getAllSorted";
     public static final String BETWEEN_HALF_OPEN = "Meal.getBetweenHalfOpen";
 
@@ -102,5 +109,27 @@ public class Meal extends AbstractBaseEntity {
                 ", description='" + description + '\'' +
                 ", calories=" + calories +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Meal)) {
+            System.out.println(1111);
+            return false;
+        }
+        Meal meal = (Meal) o;
+        if ((this.getId() == null && meal.getId() != null) ||
+                (this.getId() != null &&
+                        !this.getId().equals(meal.getId()))) {
+            System.out.println(2222);
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        System.out.println("meal id=" + id + " " + Objects.hash(super.hashCode(), dateTime, description, calories));
+        return Objects.hash(super.hashCode(), dateTime, description, calories);
     }
 }
