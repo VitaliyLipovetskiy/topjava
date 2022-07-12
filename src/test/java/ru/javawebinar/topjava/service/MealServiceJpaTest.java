@@ -7,5 +7,5 @@ import ru.javawebinar.topjava.Profiles;
  * @author Vitalii Lypovetskyi
  */
 @ActiveProfiles(profiles = {Profiles.JPA})
-public class MealServiceJpaTest extends MealServiceTest {
+public class MealServiceJpaTest extends AbstractMealServiceTest {
 }

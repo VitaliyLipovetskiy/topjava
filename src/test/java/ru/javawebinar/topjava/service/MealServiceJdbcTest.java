@@ -7,5 +7,5 @@ import ru.javawebinar.topjava.Profiles;
  * @author Vitalii Lypovetskyi
  */
 @ActiveProfiles(profiles = {Profiles.JDBC})
-public class MealServiceJdbcTest extends MealServiceTest {
+public class MealServiceJdbcTest extends AbstractMealServiceTest {
 }

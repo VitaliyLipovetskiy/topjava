@@ -7,5 +7,5 @@ import ru.javawebinar.topjava.Profiles;
  * @author Vitalii Lypovetskyi
  */
 @ActiveProfiles(profiles = {Profiles.DATAJPA})
-public class UserServiceDataJpaTest extends UserServiceTest {
+public class UserServiceDataJpaTest extends AbstractUserServiceTest {
 }
