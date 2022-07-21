@@ -22,4 +22,10 @@ public interface UserRepository {
     default User getWithMeals(int id) {
         throw new UnsupportedOperationException();
     }
+
+    default int[] batchUpdate(List<User> users) {
+        return new int[0];
+    }
+
+    ;
 }

@@ -19,6 +19,8 @@
             <th><spring:message code="user.roles"/></th>
             <th><spring:message code="user.active"/></th>
             <th><spring:message code="user.registered"/></th>
+            <th></th>
+            <th></th>
         </tr>
         </thead>
         <c:forEach items="${requestScope.users}" var="user">
@@ -29,6 +31,12 @@
                 <td>${user.roles}</td>
                 <td>${user.enabled}</td>
                 <td><fmt:formatDate value="${user.registered}" pattern="dd-MM-yyyy"/></td>
+                <td>
+                    <a href="users/${user.id}"><spring:message code="common.update"/></a>
+                </td>
+                <td>
+                    <a href="users/${user.id}"><spring:message code="common.delete"/></a>
+                </td>
             </tr>
         </c:forEach>
     </table>
