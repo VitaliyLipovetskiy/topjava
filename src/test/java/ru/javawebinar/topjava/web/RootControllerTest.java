@@ -9,6 +9,7 @@ import ru.javawebinar.topjava.util.MealsUtil;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.forwardedUrl;
@@ -37,22 +38,16 @@ class RootControllerTest extends AbstractControllerTest {
                 ));
     }
 
-//    @Test
-//    void getMeals() throws Exception {
-//        perform(get("/meals"))
-//                .andDo(print())
-//                .andExpect(status().isOk())
-//                .andExpect(view().name("meals"))
-//                .andExpect(forwardedUrl("/WEB-INF/jsp/meals.jsp"))
-//                .andExpect(model().attribute("meals",
-//                        new AssertionMatcher<List<Meal>>() {
-//                            @Override
-//                            public void assertion(List<Meal> actual) throws AssertionError {
-//                                MEAL_MATCHER.assertMatch(actual, meals);
-//                            }
-//                        }
-//                ));
-//    }
+    @Test
+    void getMeals() throws Exception {
+        perform(get("/meals"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(view().name("meals"))
+                .andExpect(forwardedUrl("/WEB-INF/jsp/meals.jsp"))
+                .andExpect(model().attribute("meals",
+                        MealsUtil.getTos(meals, MealsUtil.DEFAULT_CALORIES_PER_DAY)));
+    }
 
     @Test
     void getMealsTo() throws Exception {
