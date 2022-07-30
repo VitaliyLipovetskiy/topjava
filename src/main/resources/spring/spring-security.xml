@@ -1,0 +1,41 @@
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+             xmlns:beans="http://www.springframework.org/schema/beans"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
+
+    <!--отключаем security для статических ресурсов..-->
+    <http pattern="/resources/**" security="none"/>
+    <!-- и библиотек webjars -->
+    <http pattern="/webjars/**" security="none"/>
+
+    <!--Для всех запросов, которые будут соответствовать паттерну "/rest/**" (запросы к REST контроллерам)-->
+    <!--включаем авторизацию, включаем возможность использования expressionLanguage для проверки доступа -->
+    <!--и отключаем создание сессии (сессия будет использоваться для UI контроллеров, будем смотреть на нее позже) -->
+    <http pattern="/rest/**" use-expressions="true" name="restSecurityFilterChain" create-session="stateless">
+        <!--Будет использоваться базовая авторизация, логин и пароль будут передаваться в заголовке запроса, закодированные в Base64 (открыто) -->
+        <http-basic/>
+        <!--Чтобы обратиться к endpoint с паттерном "/rest/admin/**", пользователь должен иметь роль ADMIN-->
+        <intercept-url pattern="/rest/admin/**" access="hasRole('ADMIN')"/>
+        <!--Ко всем остальным endpoint будут иметь доступ только аутентифицированные пользователи-->
+        <intercept-url pattern="/**" access="isAuthenticated()"/>
+        <!--Выключаем защиту от межсайтовой подделки запросов, будем смотреть на нее и включим позже-->
+        <csrf disabled="true"/>
+    </http>
+
+    <!-- Конфигурируем хранение пароля в открытом виде (сделаем шифрацию позднее) -->
+    <beans:bean name="noopEncoder" class="org.springframework.security.crypto.password.NoOpPasswordEncoder"/>
+
+    <!--Настройка аутентификации пользователей -->
+    <authentication-manager>
+        <authentication-provider>
+            <!-- Кодировщик паролей -->
+            <password-encoder ref="noopEncoder"/>
+            <!-- Явно задаем данные пользователей в конфигурации (изменим на следующем уроке на реальные, из базы) -->
+            <user-service>
+                <user name="user@yandex.ru" password="password" authorities="ROLE_USER"/>
+                <user name="admin@gmail.com" password="admin" authorities="ROLE_ADMIN"/>
+            </user-service>
+        </authentication-provider>
+    </authentication-manager>
+</beans:beans>
