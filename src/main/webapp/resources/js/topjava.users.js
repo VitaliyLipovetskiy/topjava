@@ -44,4 +44,22 @@ $(function () {
             ]
         })
     );
+
+    $(".user-enabled").click(function () {
+        enableRow($(this).closest('tr').attr("id"));
+    })
+
 });
+
+function enableRow(id) {
+    $.post({
+        url: ctx.ajaxUrl + "enabled",
+        data: {"id": id}
+    }).done(function () {
+        $.get(ctx.ajaxUrl, function (data) {
+            console.log(data);
+            ctx.datatableApi.clear().rows.add(data).draw();
+        });
+        successNoty("Updated");
+    });
+}
