@@ -28,6 +28,7 @@ public class DateTimeUtil {
     }
 
     public static String toString(LocalDateTime ldt) {
+//        System.out.println(ldt);
         return ldt == null ? "" : ldt.format(DATE_TIME_FORMATTER);
     }
 
@@ -40,4 +41,10 @@ public class DateTimeUtil {
     LocalTime parseLocalTime(@Nullable String str) {
         return StringUtils.hasLength(str) ? LocalTime.parse(str) : null;
     }
+
+    public static @Nullable
+    LocalDateTime parseLocalDateTime(@Nullable String str) {
+        return StringUtils.hasLength(str) ? LocalDateTime.parse(str.replace(" ", "T")) : null;
+    }
+
 }

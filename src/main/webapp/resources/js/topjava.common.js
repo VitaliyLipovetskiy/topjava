@@ -4,6 +4,12 @@ function makeEditable(datatableApi) {
     ctx.datatableApi = datatableApi;
     form = $('#detailsForm');
 
+    $("#calories").blur(function () {
+        if ($(this).val() === "") {
+            $(this).val(0);
+        }
+    });
+
     $(document).ajaxError(function (event, jqXHR, options, jsExc) {
         failNoty(jqXHR);
     });
@@ -23,7 +29,11 @@ function updateRow(id) {
     $("#modalTitle").html(i18n["editTitle"]);
     $.get(ctx.ajaxUrl + id, function (data) {
         $.each(data, function (key, value) {
-            form.find("input[name='" + key + "']").val(value);
+            if (key === 'dateTime') {
+                form.find("input[name='" + key + "']").val(value.replace('T', ' ').substring(0, 16));
+            } else {
+                form.find("input[name='" + key + "']").val(value);
+            }
         });
         $('#editRow').modal();
     });
