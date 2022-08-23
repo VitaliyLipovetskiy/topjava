@@ -1,5 +1,6 @@
 package ru.javawebinar.topjava.web.user;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.support.SessionStatus;
+import ru.javawebinar.topjava.AuthorizedUser;
 import ru.javawebinar.topjava.to.UserTo;
 import ru.javawebinar.topjava.web.SecurityUtil;
 
@@ -20,18 +22,19 @@ import static ru.javawebinar.topjava.web.ExceptionInfoHandler.EXCEPTION_DUPLICAT
 public class ProfileUIController extends AbstractUserController {
 
     @GetMapping
-    public String profile() {
+    public String profile(ModelMap model, @AuthenticationPrincipal AuthorizedUser authUser) {
+        model.addAttribute("userTo", authUser.getUserTo());
         return "profile";
     }
 
     @PostMapping
-    public String updateProfile(@Valid UserTo userTo, BindingResult result, SessionStatus status) {
+    public String updateProfile(@Valid UserTo userTo, BindingResult result, SessionStatus status, @AuthenticationPrincipal AuthorizedUser authUser) {
         if (result.hasErrors()) {
             return "profile";
         }
         try {
-            super.update(userTo, SecurityUtil.authUserId());
-            SecurityUtil.get().setTo(userTo);
+            super.update(userTo, authUser.getId());
+            authUser.setTo(userTo);
             status.setComplete();
             return "redirect:/meals";
         } catch (DataIntegrityViolationException ex) {
